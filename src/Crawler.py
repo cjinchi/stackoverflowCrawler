@@ -29,7 +29,7 @@ try:
     response = urllib.request.urlopen(request, timeout=20)
 except urllib.error.HTTPError:
     print('【HTTP ERROR】')
-    time.sleep(10)
+    exit()
 except urllib.error.URLError:
     print('【URL ERROR】')
 except socket.timeout:
@@ -56,6 +56,7 @@ try:
 except sqlite3.OperationalError:
     print('table exist')
 page_num=TOTAL_PAGE_NUM+1
+http_error_num=0
 while page_num>1:
     if page_num % 100 ==0:
         time.sleep(1)
@@ -66,8 +67,10 @@ while page_num>1:
         request.add_header("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)")
         response = urllib.request.urlopen(request, timeout=10)
     except urllib.error.HTTPError:
-        print('【HTTP ERROR】')
-        time.sleep(10)
+        page_num+=1
+        http_error_num+=1
+        print('【HTTP ERROR】,begin to sleep %d seconds' % (2**(http_error_num+2)))
+        time.sleep(2**(http_error_num+2))
         continue
     except urllib.error.URLError:
         print('【URL ERROR】')
@@ -80,6 +83,7 @@ while page_num>1:
         print('【Unknown ERROR】')
         continue
     else:
+        http_error_num=0
         page_code = response.read().decode("utf-8")
         raw_id_str=question_page_pattern.findall(page_code)
         for str in raw_id_str:
@@ -93,7 +97,7 @@ while page_num>1:
                 continue
             else:
                 success_question_num+=1
-                print('succ num= %d' % success_question_num)
+    print('page num= %d' % (TOTAL_PAGE_NUM - page_num + 1))
     question_db.commit()
 question_db.close()
 print('succ = %d' % success_question_num)
