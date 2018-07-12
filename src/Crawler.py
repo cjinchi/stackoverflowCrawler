@@ -16,6 +16,8 @@ encoding_tag_name=''
 for i in TAG_NAME:                       #get decoding tag name
     if i=='+':
         encoding_tag_name+='%%2b'        # %2b代表'+'，第一个%用于转义
+    elif i==' ':
+    	encoding_tag_name+='%%20'
     else:
         encoding_tag_name+=i
 URL='https://stackoverflow.com/questions/tagged/%s?page=%%d&sort=newest&pagesize=50'% encoding_tag_name
