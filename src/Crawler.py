@@ -2,7 +2,6 @@ import urllib.request
 import urllib.error
 import re
 import urllib
-import socket
 import sqlite3
 import time
 
@@ -30,15 +29,9 @@ def get_total_page_num(url_form):
             "User-Agent",
             "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)")
         response = urllib.request.urlopen(request, timeout=20)
-    except urllib.error.HTTPError:
-        print('【HTTP ERROR】')
+    except Exception as e:
+        print(e)
         exit()
-    except urllib.error.URLError:
-        print('【URL ERROR】')
-    except socket.timeout:
-        print('【TIMEOUT ERROR】')
-    except Exception:
-        print('【Unknown ERROR】')
     else:
         page_code = response.read().decode("utf-8")
     page_num_span_pattern = re.compile('<span class="page-numbers">.*?</span>')
@@ -80,15 +73,8 @@ def save_ids(url_form, total_page_num):
                   (2**(http_error_num + 2)))
             time.sleep(2**(http_error_num + 2))
             continue
-        except urllib.error.URLError:
-            print('【URL ERROR】')
-            print(url)
-            continue
-        except socket.timeout:
-            print('【TIMEOUT ERROR】')
-            continue
-        except Exception:
-            print('【Unknown ERROR】')
+        except Exception as e:
+            print(e)
             continue
         else:
             http_error_num = 0
